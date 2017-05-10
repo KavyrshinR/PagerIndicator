@@ -5,5 +5,5 @@
     <color name="colorAccent">#FF4081</color>
 
     <color name="default_unselected">#1565C0</color>
-    <color name="default_selected">#ffffff</color>
+    <color name="default_selected">#aaaaaa</color>
 </resources>
