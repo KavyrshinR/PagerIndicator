@@ -1,16 +1,21 @@
 package ru.kavyrshin.indicator;
 
+import android.animation.IntEvaluator;
+import android.animation.PropertyValuesHolder;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
+import android.view.animation.DecelerateInterpolator;
 
-public class PagerIndicator extends View {
+public class PagerIndicator extends View implements ViewPager.OnPageChangeListener {
 
     private static final int DEFAULT_RADIUS = 6;
     private static final int DEFAULT_PADDING = 8;
@@ -24,6 +29,11 @@ public class PagerIndicator extends View {
     private int unselectedColor;
 
     private int currentPosition;
+    private int selectingPosition;
+
+    private int animationDuration = 350;
+    private ValueAnimator valueAnimator;
+    private int frameFrom;
 
     private Paint paint;
 
@@ -45,6 +55,20 @@ public class PagerIndicator extends View {
         unselectedColor = typedArray.getColor(R.styleable.PagerIndicator_pi_unselectedColor, ContextCompat.getColor(getContext(), R.color.default_unselected));
 
         typedArray.recycle();
+
+        valueAnimator = new ValueAnimator();
+        valueAnimator.setDuration(animationDuration);
+        valueAnimator.setInterpolator(new DecelerateInterpolator());
+        valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                Log.d("myLogs", "Animation update " +
+                        animation.getAnimatedValue() +
+                        " playtime " + animation.getCurrentPlayTime());
+                frameFrom = (int) animation.getAnimatedValue();
+                invalidate();
+            }
+        });
     }
 
     public PagerIndicator(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
@@ -87,7 +111,37 @@ public class PagerIndicator extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        drawIndicator(canvas);
+        //drawIndicator(canvas);
+        drawIndicatorWithSwapAnimation(canvas);
+    }
+
+    private void drawIndicatorWithSwapAnimation(Canvas canvas) {
+        paint.setColor(unselectedColor);
+
+        int step = (2 * dotRadiusPx) + dotPaddingPx;
+
+        int width = getWidth();
+        int height = getHeight();
+
+        for (int i = 0; i < countIndicator; i++) {
+
+            int selectingSrcX = getXCoordinate(selectingPosition);
+            int currentSrcX = getXCoordinate(currentPosition);
+
+            if (i == currentPosition) {
+                paint.setColor(selectedColor);
+                int x = frameFrom;
+                canvas.drawCircle(x, height / 2, dotRadiusPx, paint);
+            } else if(i == selectingPosition) {
+                paint.setColor(unselectedColor);
+                int x = selectingSrcX > frameFrom ? selectingSrcX - (frameFrom - currentSrcX) : selectingSrcX + (currentSrcX - frameFrom);
+                canvas.drawCircle(x, height / 2, dotRadiusPx, paint);
+            } else {
+                paint.setColor(unselectedColor);
+                int x = dotRadiusPx + (step * i);
+                canvas.drawCircle(x, height / 2, dotRadiusPx, paint);
+            }
+        }
     }
 
     private void drawIndicator(Canvas canvas) {
@@ -106,10 +160,42 @@ public class PagerIndicator extends View {
                 paint.setColor(unselectedColor);
             }
 
-            int x = dotRadiusPx + (step * i);
+            int x = dotRadiusPx + (step * i); // Начинаем рисовать не с нуля, а с точки куда вместится первая "точка"
             canvas.drawCircle(x, height / 2, dotRadiusPx, paint);
         }
     }
+
+    @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+        Log.d("myLogs", "Position " + position + " Offset " + positionOffset);
+
+        if (position < currentPosition) {
+            selectingPosition = position;
+        } else {
+            selectingPosition = currentPosition + 1;
+        }
+
+        int playTime = (int) (animationDuration * positionOffset);
+
+        PropertyValuesHolder propertyValuesHolder = PropertyValuesHolder.ofInt("values", getXCoordinate(currentPosition), getXCoordinate(selectingPosition));
+        propertyValuesHolder.setEvaluator(new IntEvaluator());
+        valueAnimator.setValues(propertyValuesHolder);
+        valueAnimator.setCurrentPlayTime(playTime);
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+        Log.d("myLogs", "onPageSelected " + position);
+        setCurrentPosition(position);
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+
+    }
+
+
+    ////////////////////////////////
 
     public int getCountIndicator() {
         return countIndicator;
@@ -145,5 +231,13 @@ public class PagerIndicator extends View {
     public void setCurrentPosition(int currentPosition) {
         this.currentPosition = currentPosition;
         invalidate();
+    }
+
+    private int getXCoordinate(int position) {
+        return dotRadiusPx + (dotRadiusPx * 2 + dotPaddingPx) * position;
+    }
+
+    private int getYCoordinate(int position) {
+        return dotRadiusPx / 2;
     }
 }
