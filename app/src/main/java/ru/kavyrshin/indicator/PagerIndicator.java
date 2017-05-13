@@ -169,7 +169,9 @@ public class PagerIndicator extends View implements ViewPager.OnPageChangeListen
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
         Log.d("myLogs", "Position " + position + " Offset " + positionOffset);
 
-        if (position < currentPosition) {
+        boolean scrollToRight = position == currentPosition;
+
+        if (!scrollToRight) {
             selectingPosition = position;
         } else {
             selectingPosition = currentPosition + 1;
@@ -177,7 +179,19 @@ public class PagerIndicator extends View implements ViewPager.OnPageChangeListen
 
         int playTime = (int) (animationDuration * positionOffset);
 
-        PropertyValuesHolder propertyValuesHolder = PropertyValuesHolder.ofInt("values", getXCoordinate(currentPosition), getXCoordinate(selectingPosition));
+        int valueFrom;
+        int valueTo;
+
+        if (scrollToRight) {
+            valueFrom = getXCoordinate(currentPosition);
+            valueTo = getXCoordinate(selectingPosition);
+        } else {
+            valueFrom = getXCoordinate(selectingPosition);
+            valueTo = getXCoordinate(currentPosition);
+        }
+
+
+        PropertyValuesHolder propertyValuesHolder = PropertyValuesHolder.ofInt("values", valueFrom, valueTo);
         propertyValuesHolder.setEvaluator(new IntEvaluator());
         valueAnimator.setValues(propertyValuesHolder);
         valueAnimator.setCurrentPlayTime(playTime);
@@ -185,7 +199,6 @@ public class PagerIndicator extends View implements ViewPager.OnPageChangeListen
 
     @Override
     public void onPageSelected(int position) {
-        Log.d("myLogs", "onPageSelected " + position);
         setCurrentPosition(position);
     }
 
