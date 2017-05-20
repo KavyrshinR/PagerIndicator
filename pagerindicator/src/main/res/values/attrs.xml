@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="PagerIndicator">
+        <attr name="pi_count" format="integer"/>
+        <attr name="pi_radius" format="integer"/>
+        <attr name="pi_dotPadding" format="integer"/>
+        <attr name="pi_selectedColor" format="color"/>
+        <attr name="pi_unselectedColor" format="color"/>
+    </declare-styleable>
+</resources>
