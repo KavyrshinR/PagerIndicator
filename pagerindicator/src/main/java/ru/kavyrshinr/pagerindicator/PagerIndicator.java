@@ -17,9 +17,6 @@ import android.view.animation.DecelerateInterpolator;
 
 public class PagerIndicator extends View implements ViewPager.OnPageChangeListener {
 
-    private static final int DEFAULT_RADIUS = 6;
-    private static final int DEFAULT_PADDING = 8;
-
     private int dotRadiusPx;
     private int dotPaddingPx;
 
@@ -48,8 +45,8 @@ public class PagerIndicator extends View implements ViewPager.OnPageChangeListen
 
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.PagerIndicator);
         countIndicator = typedArray.getInteger(R.styleable.PagerIndicator_pi_count, 0);
-        dotRadiusPx = typedArray.getInteger(R.styleable.PagerIndicator_pi_radius, Util.dpToPx(DEFAULT_RADIUS));
-        dotPaddingPx = typedArray.getInteger(R.styleable.PagerIndicator_pi_dotPadding, Util.dpToPx(DEFAULT_PADDING));
+        dotRadiusPx = typedArray.getInteger(R.styleable.PagerIndicator_pi_radius, Util.dpToPx(Const.DEFAULT_RADIUS));
+        dotPaddingPx = typedArray.getInteger(R.styleable.PagerIndicator_pi_dotPadding, Util.dpToPx(Const.DEFAULT_PADDING));
 
         selectedColor = typedArray.getColor(R.styleable.PagerIndicator_pi_selectedColor, Color.parseColor(Const.COLOR_DEFAULT_SELECTED));
         unselectedColor = typedArray.getColor(R.styleable.PagerIndicator_pi_unselectedColor, Color.parseColor(Const.COLOR_DEFAULT_UNSELECTED));
