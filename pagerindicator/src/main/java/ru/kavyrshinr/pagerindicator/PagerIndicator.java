@@ -11,7 +11,6 @@ import android.graphics.Paint;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 
@@ -59,9 +58,6 @@ public class PagerIndicator extends View implements ViewPager.OnPageChangeListen
         valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                Log.d("myLogs", "Animation update " +
-                        animation.getAnimatedValue() +
-                        " playtime " + animation.getCurrentPlayTime());
                 frameFrom = (int) animation.getAnimatedValue();
                 invalidate();
             }
@@ -164,7 +160,6 @@ public class PagerIndicator extends View implements ViewPager.OnPageChangeListen
 
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-        Log.d("myLogs", "Position " + position + " Offset " + positionOffset);
 
         boolean scrollToRight = position == currentPosition;
 
@@ -204,8 +199,6 @@ public class PagerIndicator extends View implements ViewPager.OnPageChangeListen
 
     }
 
-
-    ////////////////////////////////
 
     public int getCountIndicator() {
         return countIndicator;
