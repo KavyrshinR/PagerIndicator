@@ -99,6 +99,7 @@ public class PagerIndicator extends View implements ViewPager.OnPageChangeListen
         }
 
 
+
         setMeasuredDimension(Math.max(0, widthResult), Math.max(0, heightResult));
     }
 
